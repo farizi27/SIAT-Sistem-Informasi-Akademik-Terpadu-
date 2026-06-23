@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1781944140392,
+      "tag": "0000_outgoing_ink",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1782013491846,
+      "tag": "0001_known_exiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1782018189007,
+      "tag": "0002_common_jazinda",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1782019232840,
+      "tag": "0003_warm_omega_sentinel",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1782019696189,
+      "tag": "0004_fearless_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1782021132256,
+      "tag": "0005_pink_omega_flight",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1782023872110,
+      "tag": "0006_graceful_professor_monster",
+      "breakpoints": true
+    }
+  ]
+}
