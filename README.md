@@ -317,7 +317,7 @@ Password : admin123
 
 ## 👨‍💻 Developer
 
-Developed by **[Nama Kamu]**
+Developed by **[Ahmad Farizi, Mohammad Nizam, Rozki Khoirur ROfi dan Imam Ghazeli]**
 
 Project SIAT dibuat sebagai sistem informasi akademik berbasis web menggunakan Express.js, Drizzle ORM, MySQL, dan SvelteKit.
 
