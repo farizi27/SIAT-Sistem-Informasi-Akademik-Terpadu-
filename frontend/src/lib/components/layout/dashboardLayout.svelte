@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import Sidebar from './Sidebar.svelte';
+	import Navbar from './Navbar.svelte';
 
-	import Sidebar from '$lib/components/layout/Sidebar.svelte';
-	import Navbar from '$lib/components/layout/Navbar.svelte';
+	import type { Snippet } from 'svelte';
 
 	let {
 		children
 	}: {
-		children: Snippet;
+		children?: Snippet;
 	} = $props();
 
 	let sidebarCollapsed = $state(false);
@@ -17,18 +17,22 @@
 	}
 </script>
 
-<div class="flex min-h-screen bg-slate-100">
+<div class="flex h-screen bg-slate-100">
 
+	<!-- Sidebar -->
 	<Sidebar
 		collapsed={sidebarCollapsed}
 	/>
 
-	<div class="flex flex-1 flex-col">
+	<!-- Content -->
+	<div class="flex flex-1 flex-col overflow-hidden">
 
+		<!-- Navbar -->
 		<Navbar
 			onToggleSidebar={toggleSidebar}
 		/>
 
+		<!-- Main -->
 		<main
 			class="
 				flex-1
@@ -37,7 +41,7 @@
 			"
 		>
 
-			{@render children()}
+			{@render children?.()}
 
 		</main>
 

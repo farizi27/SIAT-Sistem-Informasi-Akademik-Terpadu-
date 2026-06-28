@@ -6,6 +6,7 @@ import { db } from "../../db/index.js";
 import {
   users,
   mahasiswa,
+  prodi,
 } from "../../db/schema/index.js";
 
 import {
@@ -175,28 +176,35 @@ export async function getAllMahasiswaService() {
   try {
 
     const result = await db
-      .select({
-        id: mahasiswa.id,
-        userId: mahasiswa.userId,
+  .select({
+    id: mahasiswa.id,
+    userId: mahasiswa.userId,
 
-        name: users.name,
-        email: users.email,
+    name: users.name,
+    email: users.email,
 
-        nim: mahasiswa.nim,
-        prodiId: mahasiswa.prodiId,
-        angkatan: mahasiswa.angkatan,
+    nim: mahasiswa.nim,
 
-        isActive: users.isActive,
-      })
-      .from(mahasiswa)
-      .innerJoin(
-        users,
-        eq(mahasiswa.userId, users.id)
-      )
-      .where(eq(users.isActive, true));
+    prodiId: mahasiswa.prodiId,
+    prodi: prodi.nama,
 
-    return result;
+    angkatan: mahasiswa.angkatan,
 
+    isActive: users.isActive,
+  })
+  .from(mahasiswa)
+  .innerJoin(
+    users,
+    eq(mahasiswa.userId, users.id)
+  )
+  .innerJoin(
+    prodi,
+    eq(mahasiswa.prodiId, prodi.id)
+  )
+  .where(
+    eq(users.isActive, true)
+  );
+  return result;
   } catch (error) {
 
     throw new Error(

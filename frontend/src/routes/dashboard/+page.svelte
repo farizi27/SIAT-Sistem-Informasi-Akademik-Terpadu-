@@ -1,118 +1,470 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
-	import StatCard
-	from '$lib/components/statCard.svelte';
+	import { user } from '$lib/stores/auth';
+	import { getDashboardSummary } from '$lib/api/dashboard';
+
+	import LoadingSpinner from '$lib/components/common/LoadingSpinner.svelte';
+	import Card from '$lib/components/common/Card.svelte';
 
 	import {
-		getDashboard
-	}
-	from '$lib/api/dashboard';
+		Users,
+		GraduationCap,
+		Building2,
+		BookOpen,
+		School,
+		Calendar,
+		ClipboardList,
+		FileText,
+		UserPlus,
+		BookPlus,
+		Plus,
+		ArrowRight
+	} from '@lucide/svelte';
 
-	let loading =
-		$state(true);
+	const currentUser = localStorage.getItem('user')
+		? JSON.parse(localStorage.getItem('user') as string)
+		: null;
 
-	let stats = $state({
-		totalMahasiswa: 0,
-		totalDosen: 0,
-		totalAdmin: 0,
-		totalProdi: 0,
-		totalMataKuliah: 0,
-		totalKelas: 0
+	const role = currentUser.role;
+	const name = currentUser.name;
+
+	let loading = $state(true);
+
+	let summary = $state({
+		mahasiswa: 0,
+		dosen: 0,
+		prodi: 0,
+		semester: 0,
+		mataKuliah: 0,
+		kelas: 0,
+		krs: 0
 	});
 
 	onMount(async () => {
 		try {
-
-			const result =
-				await getDashboard();
-
-			stats =
-				result.data ??
-				result;
-
-		} catch (error) {
-
-			console.error(error);
-
+			summary = await getDashboardSummary();
+		} catch (err) {
+			console.error(err);
 		} finally {
-
 			loading = false;
 		}
 	});
+
+	const adminActions = [
+		{
+			title: 'Tambah Mahasiswa',
+			icon: UserPlus,
+			color: 'bg-blue-600'
+		},
+		{
+			title: 'Tambah Dosen',
+			icon: GraduationCap,
+			color: 'bg-emerald-600'
+		},
+		{
+			title: 'Tambah Mata Kuliah',
+			icon: BookPlus,
+			color: 'bg-orange-500'
+		},
+		{
+			title: 'Tambah Kelas',
+			icon: Plus,
+			color: 'bg-purple-600'
+		}
+	];
 </script>
 
 {#if loading}
 
-	<div class="flex justify-center py-20">
+	<div class="flex justify-center items-center h-[70vh]">
 
-		<p>
-			Loading...
-		</p>
+		<LoadingSpinner
+			size="lg"
+			text="Memuat Dashboard..."
+		/>
 
 	</div>
 
 {:else}
 
-	<div class="space-y-6">
+	<div class="space-y-8">
+
+		<!-- Welcome -->
 
 		<div
-			class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-3xl text-white p-8"
+			class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 shadow-lg"
 		>
 
-			<h1
-				class="text-3xl font-bold"
-			>
-				Selamat Datang 👋
+			<h1 class="text-3xl font-bold">
+
+				Selamat Datang, {name} 👋
+
 			</h1>
 
-			<p class="mt-2 opacity-90">
-				Sistem Informasi Akademik Terpadu
+			<p class="mt-2 text-blue-100">
+
+				Selamat datang kembali di Sistem Informasi Akademik Terpadu.
+
 			</p>
 
 		</div>
 
-		<div
-			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-		>
+		{#if role === 'ADMIN'}
 
-			<StatCard
-				title="Mahasiswa"
-				value={stats.totalMahasiswa}
-				color="blue"
-			/>
+			<div
+				class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5"
+			>
 
-			<StatCard
-				title="Dosen"
-				value={stats.totalDosen}
-				color="green"
-			/>
+				<Card hover>
 
-			<StatCard
-				title="Admin"
-				value={stats.totalAdmin}
-				color="yellow"
-			/>
+					<div class="flex justify-between items-center">
 
-			<StatCard
-				title="Prodi"
-				value={stats.totalProdi}
-				color="purple"
-			/>
+						<div>
 
-			<StatCard
-				title="Mata Kuliah"
-				value={stats.totalMataKuliah}
-				color="orange"
-			/>
+							<p class="text-slate-500 text-sm">
+								Mahasiswa
+							</p>
 
-			<StatCard
-				title="Kelas"
-				value={stats.totalKelas}
-				color="red"
-			/>
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.mahasiswa}
+							</h2>
 
-		</div>
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
+
+							<Users class="text-blue-600"></Users>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+				<Card hover>
+
+					<div class="flex justify-between items-center">
+
+						<div>
+
+							<p class="text-slate-500 text-sm">
+								Dosen
+							</p>
+
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.dosen}
+							</h2>
+
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center">
+
+							<GraduationCap class="text-emerald-600"></GraduationCap>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+				<Card hover>
+
+					<div class="flex justify-between items-center">
+
+						<div>
+
+							<p class="text-slate-500 text-sm">
+								Program Studi
+							</p>
+
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.prodi}
+							</h2>
+
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
+
+							<Building2 class="text-purple-600"></Building2>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+				<Card hover>
+
+					<div class="flex justify-between items-center">
+
+						<div>
+
+							<p class="text-slate-500 text-sm">
+								Kelas
+							</p>
+
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.kelas}
+							</h2>
+
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center">
+
+							<School class="text-orange-600"></School>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+			</div>
+						<div
+				class="grid grid-cols-1 md:grid-cols-3 gap-5"
+			>
+
+				<Card hover>
+
+					<div class="flex justify-between items-center">
+
+						<div>
+
+							<p class="text-slate-500 text-sm">
+								Mata Kuliah
+							</p>
+
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.mataKuliah}
+							</h2>
+
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-cyan-100 flex items-center justify-center">
+
+							<BookOpen class="text-cyan-600"></BookOpen>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+				<Card hover>
+
+					<div class="flex justify-between items-center">
+
+						<div>
+
+							<p class="text-slate-500 text-sm">
+								Semester
+							</p>
+
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.semester}
+							</h2>
+
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-yellow-100 flex items-center justify-center">
+
+							<Calendar class="text-yellow-600"></Calendar>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+				<Card hover>
+
+					<div class="flex justify-between items-center">
+
+						<div>
+
+							<p class="text-slate-500 text-sm">
+								KRS
+							</p>
+
+							<h2 class="text-3xl font-bold mt-2">
+								{summary.krs}
+							</h2>
+
+						</div>
+
+						<div class="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center">
+
+							<ClipboardList class="text-red-600"></ClipboardList>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+			</div>
+
+			<div class="grid lg:grid-cols-3 gap-6">
+
+				<div class="lg:col-span-2">
+
+					<Card
+						title="Quick Action"
+						subtitle="Akses cepat menu utama"
+					>
+
+						<div class="grid md:grid-cols-2 gap-4">
+
+							{#each adminActions as action}
+
+								{@const Icon = action.icon}
+
+								<button
+									class="flex items-center justify-between rounded-xl border border-slate-200 p-4 hover:bg-slate-50 transition"
+								>
+
+									<div class="flex items-center gap-3">
+
+										<div
+											class={`w-11 h-11 rounded-xl flex items-center justify-center text-white ${action.color}`}
+										>
+
+											<Icon size={20}></Icon>
+
+										</div>
+
+										<span class="font-medium">
+											{action.title}
+										</span>
+
+									</div>
+
+									<ArrowRight size={18}></ArrowRight>
+
+								</button>
+
+							{/each}
+
+						</div>
+
+					</Card>
+
+				</div>
+
+				<Card
+					title="Aktivitas Terbaru"
+					subtitle="Aktivitas sistem"
+				>
+
+					<div class="space-y-4">
+
+						<div class="flex items-center gap-3">
+
+							<div class="w-2 h-2 rounded-full bg-blue-600"></div>
+
+							<p class="text-sm text-slate-600">
+
+								Belum ada aktivitas terbaru.
+
+							</p>
+
+						</div>
+
+					</div>
+
+				</Card>
+
+			</div>
+
+		{:else if role === 'DOSEN'}
+
+			<div class="grid md:grid-cols-3 gap-5">
+
+				<Card title="Kelas Diampu">
+
+					<h2 class="text-4xl font-bold text-blue-600">
+						0
+					</h2>
+
+				</Card>
+
+				<Card title="Mahasiswa">
+
+					<h2 class="text-4xl font-bold text-emerald-600">
+						0
+					</h2>
+
+				</Card>
+
+				<Card title="Nilai Diinput">
+
+					<h2 class="text-4xl font-bold text-orange-600">
+						0
+					</h2>
+
+				</Card>
+
+			</div>
+
+			<Card
+				title="Informasi"
+				subtitle="Dashboard Dosen"
+			>
+
+				<p class="text-slate-600">
+
+					Selamat datang di dashboard dosen.
+
+				</p>
+
+			</Card>
+
+		{:else}
+
+			<div class="grid md:grid-cols-3 gap-5">
+
+				<Card title="KRS">
+
+					<h2 class="text-4xl font-bold text-blue-600">
+						0
+					</h2>
+
+				</Card>
+
+				<Card title="SKS">
+
+					<h2 class="text-4xl font-bold text-emerald-600">
+						0
+					</h2>
+
+				</Card>
+
+				<Card title="IPK">
+
+					<h2 class="text-4xl font-bold text-orange-600">
+						0.00
+					</h2>
+
+				</Card>
+
+			</div>
+
+			<Card
+				title="Informasi Akademik"
+				subtitle="Dashboard Mahasiswa"
+			>
+
+				<p class="text-slate-600">
+
+					Selamat datang di dashboard mahasiswa.
+
+				</p>
+
+			</Card>
+
+		{/if}
 
 	</div>
 
