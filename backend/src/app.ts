@@ -17,6 +17,8 @@ import kelasRoute
 from "./modules/kelas/kelasRoute.js";
 import krsRoute
 from "./modules/krs/krsRoute.js";
+import dosenRoute
+from "./modules/dosen/dosenRoute.js";
 
 
 
@@ -70,5 +72,9 @@ app.use(
 app.use(
   "/api/krs",
   krsRoute
+);
+app.use(
+  "/api/dosen",
+  dosenRoute
 );
 export default app;

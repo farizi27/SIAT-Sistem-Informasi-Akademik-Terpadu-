@@ -7,7 +7,9 @@ export interface User {
   role: string;
 }
 
-export const user =
-  writable<User | null>(
-    null
-  );
+const isBrowser = typeof window !== "undefined";
+const storedUser = isBrowser ? localStorage.getItem("user") : null;
+
+export const user = writable<User | null>(
+  storedUser ? JSON.parse(storedUser) : null
+);

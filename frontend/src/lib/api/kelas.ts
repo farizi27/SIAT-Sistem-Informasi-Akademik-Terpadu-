@@ -4,35 +4,44 @@ export interface Kelas {
 	id: number;
 	kodeKelas: string;
 	mataKuliahId: number;
+	namaMataKuliah?: string;
+	kodeMataKuliah?: string;
+	sks?: number;
 	dosenId: number;
+	namaDosen?: string;
 	semesterId: number;
+	tahunAjaran?: string;
+	periode?: string;
 	kapasitas: number;
-	status: string;
+	status: 'AKTIF' | 'NONAKTIF';
 }
 
 export interface CreateKelasRequest {
-	nama: string;
+	kodeKelas: string;
 	mataKuliahId: number;
 	dosenId: number;
 	semesterId: number;
+	kapasitas: number;
 }
 
 export interface UpdateKelasRequest {
-	nama: string;
-	mataKuliahId: number;
-	dosenId: number;
-	semesterId: number;
+	kodeKelas?: string;
+	mataKuliahId?: number;
+	dosenId?: number;
+	semesterId?: number;
+	kapasitas?: number;
+	status?: 'AKTIF' | 'NONAKTIF';
 }
 
 export const getAllKelas = async (): Promise<Kelas[]> => {
-	const { data } = await client.get('/admin/kelas');
+	const { data } = await client.get('/kelas');
 	return data.data;
 };
 
 export const getKelasById = async (
 	id: number
 ): Promise<Kelas> => {
-	const { data } = await client.get(`/admin/kelas/${id}`);
+	const { data } = await client.get(`/kelas/${id}`);
 	return data.data;
 };
 
@@ -40,7 +49,7 @@ export const createKelas = async (
 	payload: CreateKelasRequest
 ) => {
 	const { data } = await client.post(
-		'/admin/kelas',
+		'/kelas',
 		payload
 	);
 
@@ -52,7 +61,7 @@ export const updateKelas = async (
 	payload: UpdateKelasRequest
 ) => {
 	const { data } = await client.put(
-		`/admin/kelas/${id}`,
+		`/kelas/${id}`,
 		payload
 	);
 
@@ -63,7 +72,7 @@ export const deleteKelas = async (
 	id: number
 ) => {
 	const { data } = await client.delete(
-		`/admin/kelas/${id}`
+		`/kelas/${id}`
 	);
 
 	return data;

@@ -36,7 +36,7 @@
 	class={`
 		bg-slate-900
 		text-white
-		h-screen
+		min-h-screen
 		flex
 		flex-col
 		border-r

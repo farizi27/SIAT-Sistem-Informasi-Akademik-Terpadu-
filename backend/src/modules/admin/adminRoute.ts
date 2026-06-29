@@ -6,23 +6,18 @@ import {
   getMahasiswaById,
   updateMahasiswa,
   deleteMahasiswa,
-} from "./adminController.js";
-
-import {
-  verifyToken,
-} from "../../middleware/verifyToken.js";
-
-import {
-  authorizeRole,
-} from "../../middleware/authorizeRole.js";
-
-import
- {createDosen,
+  createDosen,
+  getAllDosen,
   getDosenById,
   updateDosen,
-  getAllDosen,
   deleteDosen,
-  getDashboard} from "./adminController.js";
+  toggleUserStatus,
+  resetPassword,
+  getDashboard,
+} from "./adminController.js";
+
+import { verifyToken } from "../../middleware/verifyToken.js";
+import { authorizeRole } from "../../middleware/authorizeRole.js";
 
 const router = Router();
 
@@ -32,7 +27,6 @@ const router = Router();
 |--------------------------------------------------------------------------
 */
 
-// Create Mahasiswa
 router.post(
   "/mahasiswa",
   verifyToken,
@@ -40,7 +34,6 @@ router.post(
   createMahasiswa
 );
 
-// Get Semua Mahasiswa
 router.get(
   "/mahasiswa",
   verifyToken,
@@ -48,7 +41,6 @@ router.get(
   getAllMahasiswa
 );
 
-// Get Mahasiswa By ID
 router.get(
   "/mahasiswa/:id",
   verifyToken,
@@ -56,7 +48,6 @@ router.get(
   getMahasiswaById
 );
 
-// Update Mahasiswa
 router.put(
   "/mahasiswa/:id",
   verifyToken,
@@ -64,7 +55,6 @@ router.put(
   updateMahasiswa
 );
 
-// Soft Delete Mahasiswa
 router.delete(
   "/mahasiswa/:id",
   verifyToken,
@@ -72,7 +62,12 @@ router.delete(
   deleteMahasiswa
 );
 
-// Create Dosen
+/*
+|--------------------------------------------------------------------------
+| DOSEN
+|--------------------------------------------------------------------------
+*/
+
 router.post(
   "/dosen",
   verifyToken,
@@ -80,31 +75,6 @@ router.post(
   createDosen
 );
 
-// Get Dosen By ID
-router.get(
-  "/dosen/:id",
-  verifyToken,
-  authorizeRole("ADMIN"),
-  getDosenById
-);
-
-// Update Dosen
-router.put(
-  "/dosen/:id",
-  verifyToken,
-  authorizeRole("ADMIN"),
-  updateDosen
-);
-
-// Delete Dosen
-router.delete(
-  "/dosen/:id",
-  verifyToken,
-  authorizeRole("ADMIN"),
-  deleteDosen
-);
-
-// Get All Dosen
 router.get(
   "/dosen",
   verifyToken,
@@ -112,11 +82,59 @@ router.get(
   getAllDosen
 );
 
-// Get Dashboard Stats
+router.get(
+  "/dosen/:id",
+  verifyToken,
+  authorizeRole("ADMIN"),
+  getDosenById
+);
+
+router.put(
+  "/dosen/:id",
+  verifyToken,
+  authorizeRole("ADMIN"),
+  updateDosen
+);
+
+router.delete(
+  "/dosen/:id",
+  verifyToken,
+  authorizeRole("ADMIN"),
+  deleteDosen
+);
+
+/*
+|--------------------------------------------------------------------------
+| USER MANAGEMENT (Toggle Status & Reset Password)
+|--------------------------------------------------------------------------
+*/
+
+// Toggle aktif/nonaktif akun user berdasarkan userId
+router.patch(
+  "/users/:userId/toggle-status",
+  verifyToken,
+  authorizeRole("ADMIN"),
+  toggleUserStatus
+);
+
+// Reset password user ke NIM (mahasiswa) atau NIDN (dosen)
+router.post(
+  "/users/:userId/reset-password",
+  verifyToken,
+  authorizeRole("ADMIN"),
+  resetPassword
+);
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD
+|--------------------------------------------------------------------------
+*/
+
+// Dashboard accessible by all authenticated users (stats disesuaikan per role di frontend)
 router.get(
   "/dashboard",
   verifyToken,
-  authorizeRole("ADMIN"),
   getDashboard
 );
 

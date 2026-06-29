@@ -1,7 +1,4 @@
-import type {
-  Request,
-  Response,
-} from "express";
+import type { Request, Response } from "express";
 
 import {
   createKelasService,
@@ -9,6 +6,8 @@ import {
   getKelasByIdService,
   updateKelasService,
   deleteKelasService,
+  getKelasByDosenService,
+  getKelasByProdiService,
 } from "./kelasService.js";
 
 import {
@@ -22,17 +21,9 @@ import {
 |--------------------------------------------------------------------------
 */
 
-export async function createKelas(
-  req: Request,
-  res: Response
-) {
+export async function createKelas(req: Request, res: Response) {
   try {
-
-    const validation =
-      validateCreateKelas(
-        req.body
-      );
-
+    const validation = validateCreateKelas(req.body);
     if (!validation.isValid) {
       return res.status(400).json({
         success: false,
@@ -41,24 +32,15 @@ export async function createKelas(
       });
     }
 
-    const result =
-      await createKelasService(
-        req.body
-      );
-
+    const result = await createKelasService(req.body);
     return res.status(201).json({
       success: true,
       message: result.message,
     });
-
   } catch (error) {
-
     return res.status(400).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Terjadi kesalahan",
+      message: error instanceof Error ? error.message : "Terjadi kesalahan",
     });
   }
 }
@@ -69,30 +51,18 @@ export async function createKelas(
 |--------------------------------------------------------------------------
 */
 
-export async function getAllKelas(
-  req: Request,
-  res: Response
-) {
+export async function getAllKelas(req: Request, res: Response) {
   try {
-
-    const result =
-      await getAllKelasService();
-
+    const result = await getAllKelasService();
     return res.status(200).json({
       success: true,
-      message:
-        "Data kelas berhasil diambil",
+      message: "Data kelas berhasil diambil",
       data: result,
     });
-
   } catch (error) {
-
     return res.status(500).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Gagal mengambil data kelas",
+      message: error instanceof Error ? error.message : "Gagal mengambil data kelas",
     });
   }
 }
@@ -103,35 +73,19 @@ export async function getAllKelas(
 |--------------------------------------------------------------------------
 */
 
-export async function getKelasById(
-  req: Request,
-  res: Response
-) {
+export async function getKelasById(req: Request, res: Response) {
   try {
-
-    const id =
-      Number(req.params.id);
-
-    const result =
-      await getKelasByIdService(
-        id
-      );
-
+    const id = Number(req.params.id);
+    const result = await getKelasByIdService(id);
     return res.status(200).json({
       success: true,
-      message:
-        "Data kelas berhasil ditemukan",
+      message: "Data kelas berhasil ditemukan",
       data: result,
     });
-
   } catch (error) {
-
     return res.status(404).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Kelas tidak ditemukan",
+      message: error instanceof Error ? error.message : "Kelas tidak ditemukan",
     });
   }
 }
@@ -142,50 +96,27 @@ export async function getKelasById(
 |--------------------------------------------------------------------------
 */
 
-export async function updateKelas(
-  req: Request,
-  res: Response
-) {
+export async function updateKelas(req: Request, res: Response) {
   try {
-
-    const id =
-      Number(req.params.id);
-
-    const validation =
-      validateUpdateKelas(
-        req.body
-      );
-
+    const id = Number(req.params.id);
+    const validation = validateUpdateKelas(req.body);
     if (!validation.isValid) {
       return res.status(400).json({
         success: false,
-        message:
-          "Validasi gagal",
-        errors:
-          validation.errors,
+        message: "Validasi gagal",
+        errors: validation.errors,
       });
     }
 
-    const result =
-      await updateKelasService(
-        id,
-        req.body
-      );
-
+    const result = await updateKelasService(id, req.body);
     return res.status(200).json({
       success: true,
-      message:
-        result.message,
+      message: result.message,
     });
-
   } catch (error) {
-
     return res.status(400).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Terjadi kesalahan",
+      message: error instanceof Error ? error.message : "Terjadi kesalahan",
     });
   }
 }
@@ -196,34 +127,64 @@ export async function updateKelas(
 |--------------------------------------------------------------------------
 */
 
-export async function deleteKelas(
-  req: Request,
-  res: Response
-) {
+export async function deleteKelas(req: Request, res: Response) {
   try {
-
-    const id =
-      Number(req.params.id);
-
-    const result =
-      await deleteKelasService(
-        id
-      );
-
+    const id = Number(req.params.id);
+    const result = await deleteKelasService(id);
     return res.status(200).json({
       success: true,
-      message:
-        result.message,
+      message: result.message,
     });
-
   } catch (error) {
-
     return res.status(400).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Terjadi kesalahan",
+      message: error instanceof Error ? error.message : "Terjadi kesalahan",
+    });
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| GET KELAS BY DOSEN
+|--------------------------------------------------------------------------
+*/
+
+export async function getKelasByDosen(req: Request, res: Response) {
+  try {
+    const dosenId = Number(req.params.dosenId);
+    const result = await getKelasByDosenService(dosenId);
+    return res.status(200).json({
+      success: true,
+      message: "Data kelas dosen berhasil diambil",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Terjadi kesalahan",
+    });
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| GET KELAS BY PRODI
+|--------------------------------------------------------------------------
+*/
+
+export async function getKelasByProdi(req: Request, res: Response) {
+  try {
+    const prodiId = Number(req.params.prodiId);
+    const result = await getKelasByProdiService(prodiId);
+    return res.status(200).json({
+      success: true,
+      message: "Data kelas prodi berhasil diambil",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Terjadi kesalahan",
     });
   }
 }

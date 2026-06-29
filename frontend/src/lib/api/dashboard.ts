@@ -16,7 +16,7 @@ export interface DashboardResponse {
 }
 
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
-	const { data } = await client.get<DashboardResponse>('/dashboard');
+	const { data } = await client.get<DashboardResponse>('/admin/dashboard');
 
 	return data.data;
 };

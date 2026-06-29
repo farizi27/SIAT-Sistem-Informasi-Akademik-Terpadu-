@@ -87,11 +87,11 @@
 				<div>
 
 					<p class="text-sm text-slate-500">
-						ID Program Studi
+						Program Studi
 					</p>
 
 					<p class="font-semibold">
-						{data.prodiId}
+						{data.prodi}
 					</p>
 
 				</div>

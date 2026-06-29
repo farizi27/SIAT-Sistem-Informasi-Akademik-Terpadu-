@@ -1,143 +1,95 @@
 <script lang="ts">
 	import Modal from '$lib/components/modal/Modal.svelte';
-	import type { Mahasiswa } from '$lib/api/mahasiswa';
+	import Button from '$lib/components/common/Button.svelte';
+	import Swal from 'sweetalert2';
+	import { logActivity } from '$lib/utils/activityLog';
+
+	import {
+		deleteMahasiswa,
+		type Mahasiswa
+	} from '$lib/api/mahasiswa';
 
 	interface Props {
 		open: boolean;
 		data: Mahasiswa | null;
 		onClose: () => void;
+		onSuccess: () => void;
 	}
 
 	let {
 		open,
 		data,
-		onClose
+		onClose,
+		onSuccess
 	}: Props = $props();
+
+	let loading = $state(false);
+
+	async function handleDelete() {
+		if (!data) return;
+
+		loading = true;
+
+		try {
+			await deleteMahasiswa(data.id);
+			logActivity({ type: 'delete', module: 'Mahasiswa', description: `Mahasiswa "${data.name}" (NIM: ${data.nim}) berhasil dihapus.` });
+			onSuccess();
+		} catch (error: any) {
+			console.error(error);
+			Swal.fire({
+				icon: 'error',
+				title: 'Gagal Menghapus!',
+				text: error?.response?.data?.message || 'Terjadi kesalahan saat menghapus data.'
+			});
+		} finally {
+			loading = false;
+		}
+	}
 </script>
 
 <Modal
 	open={open}
-	title="Detail Mahasiswa"
-	size="md"
+	title="Hapus Mahasiswa"
+	size="sm"
 	{onClose}
 >
-
 	{#if data}
-
-		<div class="space-y-5">
-
-			<div class="grid grid-cols-2 gap-4">
-
-				<div>
-
-					<p class="text-sm text-slate-500">
-						Nama
-					</p>
-
-					<p class="font-semibold">
-						{data.name}
-					</p>
-
+		<div class="space-y-6">
+			<div class="text-center">
+				<div class="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center text-red-600 text-3xl">
+					🗑️
 				</div>
 
-				<div>
+				<h3 class="mt-4 text-lg font-semibold text-slate-800">
+					Hapus Mahasiswa
+				</h3>
 
-					<p class="text-sm text-slate-500">
-						Email
-					</p>
+				<p class="mt-2 text-sm text-slate-500">
+					Apakah Anda yakin ingin menghapus mahasiswa
+					<strong>{data.name}</strong> (NIM: {data.nim})?
+				</p>
 
-					<p class="font-semibold">
-						{data.email}
-					</p>
-
-				</div>
-
+				<p class="mt-1 text-xs text-red-500">
+					Tindakan ini tidak dapat dibatalkan.
+				</p>
 			</div>
 
-			<div class="grid grid-cols-2 gap-4">
-
-				<div>
-
-					<p class="text-sm text-slate-500">
-						NIM
-					</p>
-
-					<p class="font-semibold">
-						{data.nim}
-					</p>
-
-				</div>
-
-				<div>
-
-					<p class="text-sm text-slate-500">
-						Angkatan
-					</p>
-
-					<p class="font-semibold">
-						{data.angkatan}
-					</p>
-
-				</div>
-
-			</div>
-
-			<div class="grid grid-cols-2 gap-4">
-
-				<div>
-
-					<p class="text-sm text-slate-500">
-						ID Program Studi
-					</p>
-
-					<p class="font-semibold">
-						{data.prodiId}
-					</p>
-
-				</div>
-
-				<div>
-
-					<p class="text-sm text-slate-500">
-						Status
-					</p>
-
-					<span
-						class={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-							data.isActive
-								? 'bg-green-100 text-green-700'
-								: 'bg-red-100 text-red-700'
-						}`}
-					>
-						{data.isActive ? 'Aktif' : 'Tidak Aktif'}
-					</span>
-
-				</div>
-
-			</div>
-
-			<div class="pt-4 border-t border-slate-200 flex justify-end">
-
-				<button
-					type="button"
+			<div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+				<Button
+					variant="outline"
 					onclick={onClose}
-					class="
-						px-4
-						py-2
-						rounded-xl
-						bg-slate-700
-						text-white
-						hover:bg-slate-800
-						transition
-					"
 				>
-					Tutup
-				</button>
+					Batal
+				</Button>
 
+				<Button
+					variant="danger"
+					loading={loading}
+					onclick={handleDelete}
+				>
+					Hapus
+				</Button>
 			</div>
-
 		</div>
-
 	{/if}
-
 </Modal>

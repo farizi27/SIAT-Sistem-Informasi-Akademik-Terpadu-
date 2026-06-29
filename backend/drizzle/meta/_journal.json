@@ -50,6 +50,13 @@
       "when": 1782023872110,
       "tag": "0006_graceful_professor_monster",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1782739150678,
+      "tag": "0007_magical_rhino",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
-
+	import { goto } from '$app/navigation';
 	import { user } from '$lib/stores/auth';
 	import { getDashboardSummary } from '$lib/api/dashboard';
 
@@ -20,8 +19,15 @@
 		UserPlus,
 		BookPlus,
 		Plus,
-		ArrowRight
+		ArrowRight,
+		PlusCircle,
+		PenLine,
+		Trash2,
+		Star,
+		RefreshCw
 	} from '@lucide/svelte';
+
+	import { getActivities, formatTimestamp, clearActivities, type ActivityLog } from '$lib/utils/activityLog';
 
 	const currentUser = localStorage.getItem('user')
 		? JSON.parse(localStorage.getItem('user') as string)
@@ -42,6 +48,8 @@
 		krs: 0
 	});
 
+	let activities = $state<ActivityLog[]>([]);
+
 	onMount(async () => {
 		try {
 			summary = await getDashboardSummary();
@@ -50,28 +58,42 @@
 		} finally {
 			loading = false;
 		}
+		activities = getActivities();
 	});
+
+	function refreshActivities() {
+		activities = getActivities();
+	}
+
+	function handleClearActivities() {
+		clearActivities();
+		activities = [];
+	}
 
 	const adminActions = [
 		{
 			title: 'Tambah Mahasiswa',
 			icon: UserPlus,
-			color: 'bg-blue-600'
+			color: 'bg-blue-600',
+			path: '/dashboard/mahasiswa'
 		},
 		{
 			title: 'Tambah Dosen',
 			icon: GraduationCap,
-			color: 'bg-emerald-600'
+			color: 'bg-emerald-600',
+			path: '/dashboard/dosen'
 		},
 		{
 			title: 'Tambah Mata Kuliah',
 			icon: BookPlus,
-			color: 'bg-orange-500'
+			color: 'bg-orange-500',
+			path: '/dashboard/mata-kuliah'
 		},
 		{
 			title: 'Tambah Kelas',
 			icon: Plus,
-			color: 'bg-purple-600'
+			color: 'bg-purple-600',
+			path: '/dashboard/kelas'
 		}
 	];
 </script>
@@ -322,7 +344,8 @@
 								{@const Icon = action.icon}
 
 								<button
-									class="flex items-center justify-between rounded-xl border border-slate-200 p-4 hover:bg-slate-50 transition"
+									onclick={() => goto(action.path)}
+									class="flex items-center justify-between rounded-xl border border-slate-200 p-4 hover:bg-slate-50 transition cursor-pointer"
 								>
 
 									<div class="flex items-center gap-3">
@@ -355,25 +378,64 @@
 
 				<Card
 					title="Aktivitas Terbaru"
-					subtitle="Aktivitas sistem"
+					subtitle="Riwayat perubahan sistem"
 				>
-
-					<div class="space-y-4">
-
-						<div class="flex items-center gap-3">
-
-							<div class="w-2 h-2 rounded-full bg-blue-600"></div>
-
-							<p class="text-sm text-slate-600">
-
-								Belum ada aktivitas terbaru.
-
-							</p>
-
+					<div class="mb-4 flex items-center justify-between">
+						<span class="text-xs text-slate-400">Maks 20 entri terakhir</span>
+						<div class="flex gap-2">
+							<button
+								onclick={refreshActivities}
+								class="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition"
+								title="Perbarui log"
+							>
+								<RefreshCw size={12} />
+							</button>
+							{#if activities.length > 0}
+								<button
+									onclick={handleClearActivities}
+									class="rounded-lg px-2 py-1 text-xs text-red-400 hover:bg-red-50 hover:text-red-600 transition"
+								>
+									Bersihkan
+								</button>
+							{/if}
 						</div>
-
 					</div>
 
+					{#if activities.length === 0}
+						<div class="flex flex-col items-center justify-center py-8 text-slate-400">
+							<ClipboardList size={36} class="mb-3 opacity-30" />
+							<p class="text-sm font-medium">Belum ada aktivitas</p>
+							<p class="text-xs mt-1">Aktivitas akan muncul saat data diubah</p>
+						</div>
+					{:else}
+						<div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+							{#each activities as activity (activity.id)}
+								{@const isCreate = activity.type === 'create'}
+								{@const isUpdate = activity.type === 'update'}
+								{@const isDelete = activity.type === 'delete'}
+								{@const isNilai = activity.type === 'nilai'}
+								<div class="flex items-start gap-3 rounded-lg p-2.5 hover:bg-slate-50 transition">
+									<div class={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full
+										${isCreate ? 'bg-emerald-100 text-emerald-600' : ''}
+										${isUpdate ? 'bg-blue-100 text-blue-600' : ''}
+										${isDelete ? 'bg-red-100 text-red-500' : ''}
+										${isNilai ? 'bg-purple-100 text-purple-600' : ''}
+									`}>
+										{#if isCreate}<PlusCircle size={14} />
+										{:else if isUpdate}<PenLine size={14} />
+										{:else if isDelete}<Trash2 size={14} />
+										{:else}<Star size={14} />
+										{/if}
+									</div>
+									<div class="flex-1 min-w-0">
+										<p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">{activity.module}</p>
+										<p class="text-sm text-slate-700 leading-snug">{activity.description}</p>
+										<p class="text-xs text-slate-400 mt-1">{formatTimestamp(activity.timestamp)} &bull; {activity.actor}</p>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
 				</Card>
 
 			</div>

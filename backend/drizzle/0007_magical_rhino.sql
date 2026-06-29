@@ -1,0 +1,1 @@
+ALTER TABLE `krs` ADD `nilai` varchar(5);

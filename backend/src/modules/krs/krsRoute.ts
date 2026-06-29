@@ -3,43 +3,49 @@ import { Router } from "express";
 import {
   getAllKRS,
   getKRSById,
+  getKRSByMahasiswa,
   createKRS,
   updateKRS,
+  updateKRSStatus,
+  updateNilaiKRS,
   deleteKRS,
 } from "./krsController.js";
 
-import {
-  verifyToken,
-} from "../../middleware/verifyToken.js";
-
-import {
-  authorizeRole,
-} from "../../middleware/authorizeRole.js";
+import { verifyToken } from "../../middleware/verifyToken.js";
+import { authorizeRole } from "../../middleware/authorizeRole.js";
 
 const router = Router();
 
-// Get All KRS
+// GET semua KRS (admin only)
 router.get(
   "/",
   verifyToken,
+  authorizeRole("ADMIN"),
   getAllKRS
 );
 
-// Get KRS By ID
+// GET KRS by ID
 router.get(
   "/:id",
   verifyToken,
   getKRSById
 );
 
-// Create KRS
+// GET KRS by Mahasiswa ID (mahasiswa, dosen, admin)
+router.get(
+  "/mahasiswa/:mahasiswaId",
+  verifyToken,
+  getKRSByMahasiswa
+);
+
+// CREATE KRS (mahasiswa & admin)
 router.post(
   "/",
   verifyToken,
   createKRS
 );
 
-// Update KRS
+// UPDATE KRS - ganti mahasiswa/kelas (admin only)
 router.put(
   "/:id",
   verifyToken,
@@ -47,7 +53,22 @@ router.put(
   updateKRS
 );
 
-// Delete KRS
+// UPDATE STATUS KRS - DRAFT/DISETUJUI/DITOLAK (admin only)
+router.patch(
+  "/:id/status",
+  verifyToken,
+  authorizeRole("ADMIN"),
+  updateKRSStatus
+);
+
+// UPDATE NILAI KRS - input nilai (admin & dosen)
+router.patch(
+  "/:id/nilai",
+  verifyToken,
+  updateNilaiKRS
+);
+
+// DELETE KRS (admin only)
 router.delete(
   "/:id",
   verifyToken,

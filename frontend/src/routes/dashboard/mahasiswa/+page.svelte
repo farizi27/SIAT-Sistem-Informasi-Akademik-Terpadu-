@@ -13,8 +13,11 @@
 	import MahasiswaDetail from './MahasiswaDetail.svelte';
 	import MahasiswaDelete from './MahasiswaDelete.svelte';
 
+	import Swal from 'sweetalert2';
 	import {
 		getAllMahasiswa,
+		resetMahasiswaPassword,
+		toggleMahasiswaStatus,
 		type Mahasiswa
 	} from '$lib/api/mahasiswa';
 
@@ -22,7 +25,9 @@
 		Plus,
 		Eye,
 		Pencil,
-		Trash2
+		Trash2,
+		Key,
+		Power
 	} from '@lucide/svelte';
 
 	let loading = $state(true);
@@ -167,6 +172,48 @@
 
 		showDelete = true;
 
+	}
+
+	async function handleResetPassword(userId: number, name: string) {
+		const result = await Swal.fire({
+			title: 'Reset Password?',
+			text: `Apakah Anda yakin ingin me-reset password untuk ${name}?`,
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Ya, Reset',
+			cancelButtonText: 'Batal'
+		});
+
+		if (result.isConfirmed) {
+			try {
+				await resetMahasiswaPassword(userId);
+				Swal.fire('Berhasil!', 'Password berhasil direset ke NIM.', 'success');
+			} catch (err: any) {
+				Swal.fire('Gagal!', err?.response?.data?.message || 'Gagal me-reset password.', 'error');
+			}
+		}
+	}
+
+	async function handleToggleStatus(userId: number, name: string, currentStatus: boolean) {
+		const actionWord = currentStatus ? 'menonaktifkan' : 'mengaktifkan';
+		const result = await Swal.fire({
+			title: `${actionWord.toUpperCase()} AKUN?`,
+			text: `Apakah Anda yakin ingin ${actionWord} akun untuk ${name}?`,
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: `Ya, ${currentStatus ? 'Nonaktifkan' : 'Aktifkan'}`,
+			cancelButtonText: 'Batal'
+		});
+
+		if (result.isConfirmed) {
+			try {
+				await toggleMahasiswaStatus(userId);
+				Swal.fire('Berhasil!', `Status akun ${name} berhasil diubah.`, 'success');
+				loadMahasiswa();
+			} catch (err: any) {
+				Swal.fire('Gagal!', err?.response?.data?.message || 'Gagal mengubah status akun.', 'error');
+			}
+		}
 	}
 
 	onMount(loadMahasiswa);
@@ -335,6 +382,7 @@
 									size="sm"
 									onclick={() =>
 										detailMahasiswa(item)}
+									title="Detail"
 								>
 
 									<Eye size={16}></Eye>
@@ -346,9 +394,34 @@
 									size="sm"
 									onclick={() =>
 										editMahasiswa(item)}
+									title="Edit"
 								>
 
 									<Pencil size={16}></Pencil>
+
+								</Button>
+
+								<Button
+									variant="secondary"
+									size="sm"
+									onclick={() =>
+										handleResetPassword(item.userId, item.name)}
+									title="Reset Password"
+								>
+
+									<Key size={16}></Key>
+
+								</Button>
+
+								<Button
+									variant={item.isActive ? "danger" : "success"}
+									size="sm"
+									onclick={() =>
+										handleToggleStatus(item.userId, item.name, item.isActive)}
+									title={item.isActive ? "Nonaktifkan Akun" : "Aktifkan Akun"}
+								>
+
+									<Power size={16}></Power>
 
 								</Button>
 
@@ -357,6 +430,7 @@
 									size="sm"
 									onclick={() =>
 										hapusMahasiswa(item)}
+									title="Hapus"
 								>
 
 									<Trash2 size={16}></Trash2>

@@ -4,6 +4,8 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../../db/index.js";
 import { users } from "../../db/schema/user.js";
+import { dosen } from "../../db/schema/dosen.js";
+import { mahasiswa } from "../../db/schema/mahasiswa.js";
 
 const SECRET_KEY =
   process.env.JWT_SECRET!;
@@ -44,6 +46,24 @@ export async function loginService(
     }
   );
 
+  // Build extra role-specific fields
+  let dosenId: number | undefined;
+  let mahasiswaId: number | undefined;
+
+  if (user.role === "DOSEN") {
+    const dosenRows = await db
+      .select({ id: dosen.id })
+      .from(dosen)
+      .where(eq(dosen.userId, user.id));
+    if (dosenRows[0]) dosenId = dosenRows[0].id;
+  } else if (user.role === "MAHASISWA") {
+    const mhsRows = await db
+      .select({ id: mahasiswa.id })
+      .from(mahasiswa)
+      .where(eq(mahasiswa.userId, user.id));
+    if (mhsRows[0]) mahasiswaId = mhsRows[0].id;
+  }
+
   return {
     token,
     user: {
@@ -51,6 +71,8 @@ export async function loginService(
       name: user.name,
       email: user.email,
       role: user.role,
+      ...(dosenId !== undefined && { dosenId }),
+      ...(mahasiswaId !== undefined && { mahasiswaId }),
     },
   };
 }

@@ -7,12 +7,20 @@ export interface KRS {
 
 	namaMahasiswa?: string;
 	nim?: string;
+	namaProdi?: string;
 
+	kodeKelas?: string;
 	namaKelas?: string;
 	namaMataKuliah?: string;
+	kodeMataKuliah?: string;
 
 	sks?: number;
+	tahunAjaran?: string;
+	periode?: string;
 	semester?: string;
+	
+	status?: 'DRAFT' | 'DISETUJUI' | 'DITOLAK';
+	nilai?: string;
 }
 
 export interface CreateKRSRequest {
@@ -34,6 +42,13 @@ export const getKRSById = async (
 	id: number
 ): Promise<KRS> => {
 	const { data } = await client.get(`/krs/${id}`);
+	return data.data;
+};
+
+export const getKRSByMahasiswa = async (
+	mahasiswaId: number
+): Promise<KRS[]> => {
+	const { data } = await client.get(`/krs/mahasiswa/${mahasiswaId}`);
 	return data.data;
 };
 
@@ -65,6 +80,30 @@ export const deleteKRS = async (
 ) => {
 	const { data } = await client.delete(
 		`/krs/${id}`
+	);
+
+	return data;
+};
+
+export const updateKRSStatus = async (
+	id: number,
+	status: 'DRAFT' | 'DISETUJUI' | 'DITOLAK'
+) => {
+	const { data } = await client.patch(
+		`/krs/${id}/status`,
+		{ status }
+	);
+
+	return data;
+};
+
+export const updateKRSGrade = async (
+	id: number,
+	nilai: string
+) => {
+	const { data } = await client.patch(
+		`/krs/${id}/nilai`,
+		{ nilai }
 	);
 
 	return data;

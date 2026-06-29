@@ -2,7 +2,6 @@
 	import Modal from '$lib/components/modal/Modal.svelte';
 	import Button from '$lib/components/common/Button.svelte';
 	import FormInput from '$lib/components/form/FormInput.svelte';
-	import FormSelect from '$lib/components/form/FormSelect.svelte';
 
 	import {
 		createDosen,
@@ -27,25 +26,23 @@
 	}: Props = $props();
 
 	let loading = $state(false);
+	let errorMessage = $state('');
 
 	let form = $state({
 		name: '',
 		email: '',
 		password: '',
-		nidn: '',
-		prodi: ''
+		nidn: ''
 	});
 
 	function resetForm() {
-
 		form = {
 			name: '',
 			email: '',
 			password: '',
-			nidn: '',
-			prodi: ''
+			nidn: ''
 		};
-
+		errorMessage = '';
 	}
 
 	$effect(() => {
@@ -57,6 +54,7 @@
 			form.name = data.name;
 			form.email = data.email;
 			form.nidn = data.nidn;
+			form.password = '';
 
 		} else {
 
@@ -68,50 +66,52 @@
 
 	async function submit() {
 
-	loading = true;
+		errorMessage = '';
+		loading = true;
 
-	try {
+		try {
 
-		if (editMode && data) {
+			if (editMode && data) {
 
-			await updateDosen(data.id, {
-				name: form.name,
-				email: form.email,
-				nidn: form.nidn
-			});
+				await updateDosen(data.id, {
+					name: form.name,
+					email: form.email,
+					nidn: form.nidn
+				});
 
-		} else {
+			} else {
 
-			console.log({
-				name: form.name,
-				email: form.email,
-				nidn: form.nidn
-			});
+				await createDosen({
+					name: form.name,
+					email: form.email,
+					nidn: form.nidn,
+					password: form.password || undefined
+				});
 
-			const result = await createDosen({
-				name: form.name,
-				email: form.email,
-				nidn: form.nidn
-			});
+			}
 
-			console.log(result);
+			onSuccess();
+
+		} catch (err: any) {
+
+			const msg =
+				err?.response?.data?.message ||
+				err?.response?.data?.errors?.join(', ') ||
+				err?.message ||
+				'Terjadi kesalahan. Silakan coba lagi.';
+
+			errorMessage = msg;
+			console.error(err);
+
+		} finally {
+
+			loading = false;
 
 		}
 
-		onSuccess();
-
-	} catch (err) {
-
-		console.error(err);
-
-	} finally {
-
-		loading = false;
-
 	}
-
-}
 </script>
+
 <Modal
 	open={open}
 	title={editMode ? 'Edit Dosen' : 'Tambah Dosen'}
@@ -123,6 +123,12 @@
 >
 
 	<div class="space-y-5">
+
+		{#if errorMessage}
+			<div class="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+				⚠️ {errorMessage}
+			</div>
+		{/if}
 
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -145,30 +151,25 @@
 
 		</div>
 
+		<FormInput
+			label="NIDN"
+			name="nidn"
+			placeholder="Masukkan NIDN (hanya angka)"
+			required
+			bind:value={form.nidn}
+		/>
+
 		{#if !editMode}
 
 			<FormInput
-				label="Password"
+				label="Password (opsional)"
 				name="password"
 				type="password"
-				placeholder="Masukkan password"
-				required
+				placeholder="Kosongkan untuk menggunakan NIDN sebagai password"
 				bind:value={form.password}
 			/>
 
 		{/if}
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-			<FormInput
-				label="NIDN"
-				name="nidn"
-				placeholder="Masukkan NIDN"
-				required
-				bind:value={form.nidn}
-			/>
-
-		</div>
 
 		<div
 			class="

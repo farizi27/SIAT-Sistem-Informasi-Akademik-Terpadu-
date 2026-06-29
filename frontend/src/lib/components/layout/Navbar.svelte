@@ -4,13 +4,11 @@
 	import { get } from 'svelte/store';
 
 	import { user as userStore } from '$lib/stores/auth';
-
 	let {
-		onToggleSidebar
+		onToggleSidebar = () => {}
 	}: {
-		onToggleSidebar: () => void;
+		onToggleSidebar?: () => void;
 	} = $props();
-
 	const currentUser = get(userStore);
 
 	const user = {

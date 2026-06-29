@@ -21,6 +21,7 @@
 		disabled = false,
 		loading = false,
 		fullWidth = false,
+		title= "",
 		children,
 		onclick
 	}: {
@@ -30,6 +31,7 @@
 		disabled?: boolean;
 		loading?: boolean;
 		fullWidth?: boolean;
+		title?: string;
 		children?: Snippet;
 		onclick?: (event: MouseEvent) => void;
 	} = $props();
