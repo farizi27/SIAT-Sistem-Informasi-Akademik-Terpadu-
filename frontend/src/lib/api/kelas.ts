@@ -2,10 +2,12 @@ import client from './client';
 
 export interface Kelas {
 	id: number;
-	nama: string;
+	kodeKelas: string;
 	mataKuliahId: number;
 	dosenId: number;
 	semesterId: number;
+	kapasitas: number;
+	status: string;
 }
 
 export interface CreateKelasRequest {

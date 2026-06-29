@@ -72,7 +72,7 @@
 			class="
 				min-w-full
 				text-sm
-				text-left
+				text-center
 			"
 		>
 

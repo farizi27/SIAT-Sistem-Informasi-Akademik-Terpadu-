@@ -2,7 +2,8 @@ import {
   mysqlTable,
   int,
   timestamp,
-  mysqlEnum
+  mysqlEnum,
+  varchar
 } from "drizzle-orm/mysql-core";
 import { mahasiswa } from "./index.js";
 import { kelas } from "./index.js";
@@ -35,6 +36,8 @@ export const krs = mysqlTable(
     )
     .default("DRAFT")
     .notNull(),
+
+    nilai: varchar("nilai", { length: 5 }),
 
     createdAt: timestamp(
       "created_at"

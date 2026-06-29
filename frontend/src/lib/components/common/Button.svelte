@@ -55,7 +55,7 @@
 	};
 
 	const sizeClass = {
-		sm: 'px-3 py-2 text-sm',
+		sm: 'px-2 py-2 text-sm my-1',
 		md: 'px-4 py-2.5 text-sm',
 		lg: 'px-5 py-3 text-base'
 	};

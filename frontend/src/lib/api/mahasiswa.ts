@@ -6,7 +6,7 @@ export interface Mahasiswa {
 	name: string;
 	email: string;
 	nim: string;
-	prodiId: number;
+	prodi: number;
 	angkatan: number;
 	isActive: boolean;
 }

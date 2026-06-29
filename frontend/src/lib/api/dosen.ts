@@ -12,7 +12,6 @@ export interface Dosen {
 export interface CreateDosenRequest {
 	name: string;
 	email: string;
-	password: string;
 	nidn: string;
 }
 

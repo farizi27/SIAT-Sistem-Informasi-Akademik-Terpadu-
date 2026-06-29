@@ -15,6 +15,8 @@ import mataKuliahRoute
 from "./modules/mataKuliah/mataKuliahRoute.js";
 import kelasRoute
 from "./modules/kelas/kelasRoute.js";
+import krsRoute
+from "./modules/krs/krsRoute.js";
 
 
 
@@ -64,5 +66,9 @@ app.use(
 app.use(
   "/api/kelas",
   kelasRoute
+);
+app.use(
+  "/api/krs",
+  krsRoute
 );
 export default app;

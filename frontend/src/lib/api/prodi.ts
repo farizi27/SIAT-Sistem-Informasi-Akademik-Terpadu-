@@ -4,6 +4,8 @@ export interface Prodi {
 	id: number;
 	nama: string;
 	kode: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface CreateProdiRequest {
@@ -17,14 +19,14 @@ export interface UpdateProdiRequest {
 }
 
 export const getAllProdi = async (): Promise<Prodi[]> => {
-	const { data } = await client.get('/admin/prodi');
+	const { data } = await client.get('/prodi');
 	return data.data;
 };
 
 export const getProdiById = async (
 	id: number
 ): Promise<Prodi> => {
-	const { data } = await client.get(`/admin/prodi/${id}`);
+	const { data } = await client.get(`/prodi/${id}`);
 	return data.data;
 };
 
@@ -32,7 +34,7 @@ export const createProdi = async (
 	payload: CreateProdiRequest
 ) => {
 	const { data } = await client.post(
-		'/admin/prodi',
+		'/prodi',
 		payload
 	);
 
@@ -44,7 +46,7 @@ export const updateProdi = async (
 	payload: UpdateProdiRequest
 ) => {
 	const { data } = await client.put(
-		`/admin/prodi/${id}`,
+		`/prodi/${id}`,
 		payload
 	);
 
@@ -55,7 +57,7 @@ export const deleteProdi = async (
 	id: number
 ) => {
 	const { data } = await client.delete(
-		`/admin/prodi/${id}`
+		`/prodi/${id}`
 	);
 
 	return data;

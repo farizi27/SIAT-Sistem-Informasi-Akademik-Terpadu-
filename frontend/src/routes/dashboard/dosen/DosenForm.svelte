@@ -1,24 +1,19 @@
 <script lang="ts">
-
 	import Modal from '$lib/components/modal/Modal.svelte';
 	import Button from '$lib/components/common/Button.svelte';
 	import FormInput from '$lib/components/form/FormInput.svelte';
 	import FormSelect from '$lib/components/form/FormSelect.svelte';
 
 	import {
-		createMahasiswa,
-		updateMahasiswa,
-		type Mahasiswa
-	} from '$lib/api/mahasiswa';
-
-	import { getAllProdi } from '$lib/api/prodi';
-
-	import {onMount} from 'svelte';
+		createDosen,
+		updateDosen,
+		type Dosen
+	} from '$lib/api/dosen';
 
 	interface Props {
 		open: boolean;
 		editMode: boolean;
-		data: Mahasiswa | null;
+		data: Dosen | null;
 		onClose: () => void;
 		onSuccess: () => void;
 	}
@@ -37,21 +32,8 @@
 		name: '',
 		email: '',
 		password: '',
-		nim: '',
-		prodi: '',
-		angkatan: ''
-	});
-
-	let prodiOptions = $state<
-		{ label: string; value: number }[]
-	>([]);
-	onMount(async () => {
-		const data = await getAllProdi();
-
-		prodiOptions = data.map((item) => ({
-			label: item.nama,
-			value: item.id
-		}));
+		nidn: '',
+		prodi: ''
 	});
 
 	function resetForm() {
@@ -60,89 +42,79 @@
 			name: '',
 			email: '',
 			password: '',
-			nim: '',
-			prodi: '',
-			angkatan: ''
+			nidn: '',
+			prodi: ''
 		};
 
 	}
 
 	$effect(() => {
 
-        if (!open) return;
+		if (!open) return;
 
-        if (editMode && data) {
+		if (editMode && data) {
 
-            form.name = data.name;
-            form.email = data.email;
-            form.nim = data.nim;
-            form.angkatan = String(data.angkatan);
-            form.prodi = String(data.prodi);
+			form.name = data.name;
+			form.email = data.email;
+			form.nidn = data.nidn;
 
-        } else {
-
-            resetForm();
-
-        }
-
-    });
-
-	async function submit() {
-
-		loading = true;
-
-		try {
-
-			const payload = {
-
-				name: form.name,
-
-				email: form.email,
-
-				password: form.password,
-
-				nim: form.nim,
-
-				prodi: Number(form.prodi),
-
-				angkatan: Number(
-					form.angkatan
-				)
-
-			};
-			console.log(payload)
-
-			if (editMode && data) {
-
-				await updateMahasiswa(
-					data.id,
-					payload
-				);
-
-			} else {
-
-				await createMahasiswa(
-					payload
-				);
-
-			}
+		} else {
 
 			resetForm();
 
-			onSuccess();
+		}
 
-		} finally {
+	});
 
-			loading = false;
+	async function submit() {
+
+	loading = true;
+
+	try {
+
+		if (editMode && data) {
+
+			await updateDosen(data.id, {
+				name: form.name,
+				email: form.email,
+				nidn: form.nidn
+			});
+
+		} else {
+
+			console.log({
+				name: form.name,
+				email: form.email,
+				nidn: form.nidn
+			});
+
+			const result = await createDosen({
+				name: form.name,
+				email: form.email,
+				nidn: form.nidn
+			});
+
+			console.log(result);
 
 		}
 
-	}
-</script>
+		onSuccess();
 
+	} catch (err) {
+
+		console.error(err);
+
+	} finally {
+
+		loading = false;
+
+	}
+
+}
+</script>
 <Modal
 	open={open}
-	title={editMode ? 'Edit Mahasiswa' : 'Tambah Mahasiswa'}
+	title={editMode ? 'Edit Dosen' : 'Tambah Dosen'}
 	size="lg"
 	onClose={() => {
 		resetForm();
@@ -157,7 +129,7 @@
 			<FormInput
 				label="Nama Lengkap"
 				name="name"
-				placeholder="Masukkan nama mahasiswa"
+				placeholder="Masukkan nama dosen"
 				required
 				bind:value={form.name}
 			/>
@@ -189,31 +161,14 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 			<FormInput
-				label="NIM"
-				name="nim"
-				placeholder="Masukkan NIM"
+				label="NIDN"
+				name="nidn"
+				placeholder="Masukkan NIDN"
 				required
-				bind:value={form.nim}
-			/>
-
-			<FormInput
-				label="Angkatan"
-				name="angkatan"
-				type="number"
-				placeholder="Contoh: 2024"
-				required
-				bind:value={form.angkatan}
+				bind:value={form.nidn}
 			/>
 
 		</div>
-
-		<FormSelect
-			label="Program Studi"
-			name="prodi"
-			required
-			options={prodiOptions}
-			bind:value={form.prodi}
-		/>
 
 		<div
 			class="
@@ -227,8 +182,8 @@
 		>
 
 			<Button
-				variant="secondary"
 				type="button"
+				variant="outline"
 				onclick={() => {
 					resetForm();
 					onClose();
@@ -243,7 +198,15 @@
 				onclick={submit}
 			>
 
-				{editMode ? 'Simpan Perubahan' : 'Tambah Mahasiswa'}
+				{#if editMode}
+
+					Simpan Perubahan
+
+				{:else}
+
+					Tambah Dosen
+
+				{/if}
 
 			</Button>
 
